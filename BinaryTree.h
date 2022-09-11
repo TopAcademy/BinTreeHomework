@@ -14,9 +14,9 @@ private:
 public:
     BinaryTree(int);
     Node* add_node(int, Node*);
-    void show_tree(Node *);
+    void show_tree(Node*);
     void show_no_rec(Node*);
-    Node * find_node(int, Node*);
+    Node* find_node(int, Node*);
 };
 /*****************************************/
 
@@ -29,19 +29,17 @@ BinaryTree::BinaryTree(int root_value)
 }
 
 // Add node to the tree
-Node* BinaryTree::add_node(int val, Node * start = nullptr)
+Node* BinaryTree::add_node(int val, Node* start = nullptr)
 {
     // Node * added = nullptr;
     if (start == nullptr) start = this->root;
     Node* parent = start; // ???
     Node* next = (val < start->value) ? start->left : start->right;
     if (next == nullptr) {
-        // ���� �����
         next = new Node(val, start);
         start->connect_child(next);
     }
     else {
-        // �������� ������� ��� ����
         next = add_node(val, next);
     }
     return next;
@@ -82,31 +80,46 @@ Node* BinaryTree::find_node(int x, Node* start = nullptr)
 // Show tree without recursion
 void BinaryTree::show_no_rec(Node* start = nullptr)
 {
-    if (!start) start = root;
-    std::stack<Node*> st;
-    Node* current = start;
-    st.push(current);
+    if (!start) start = root;      // По-умолчанию - с корневого узла
+    std::stack<Node*> st;          // Наш стек
+    Node* current = start;         // Текущий узел
     bool parent_is_ok = false;
+    // Старт цикла обхода дерева
     do {
+        Node* st_top = (st.empty()) ? nullptr : st.top();
+        // Мы попали в узел из правого потомка?
         if (parent_is_ok) {
-            parent_is_ok = false;
+            // возвращаемся наверх
+            if (current->parent != nullptr) {
+                if (current == current->parent->right) parent_is_ok = true;
+                else parent_is_ok = false;
+                current = current->parent;
+            }
+            st.pop();
+            continue;
+        }
+        // Иначе работаем с узлом
+        // Текущий узел в стеке? 
+        if (st.empty() || (current != st.top())) {
+            // Если нет, мы только начали работу с узлом
+            st.push(current);
+            if (current->left) {
+                // Спускаемся влево, если там есть узел
+                current = current->left;
+            }
         }
         else {
-            if (current->left && (st.top() != current)) {
-                st.push(current);
-                current = current->left;
-                continue;
-            }
-            if (st.top() != current) st.push(current);
+            // Мы между левым и правым
             std::cout << current->value << ", ";
             if (current->right) {
+                // Спускаемся вправо, если там есть куда
                 current = current->right;
-                continue;
+            }
+            else {
+                // Остаемся в узле, и говорим что родитель обслужен
+                parent_is_ok = true;
             }
         }
-        st.pop();
-        if (current == st.top()->right) parent_is_ok = true;
-        current = st.top();
     } while (!st.empty());
-}
 
+}
