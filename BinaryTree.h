@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <stack>
+#include <vector>
 #include "Node.h"
 
 
@@ -16,6 +17,7 @@ public:
     BinaryTree(T);
     Node<T>* add_node(T, Node<T>* = nullptr);
     void show_tree(Node<T>* = nullptr);
+    void make_vector(std::vector<T>&, Node<T>* = nullptr);
     void show_no_rec(Node<T>* = nullptr);
     Node<T>* find_node(T, Node<T>* = nullptr);
     Node<T>* operator<<(T);
@@ -134,4 +136,15 @@ void BinaryTree<T>::show_no_rec(Node<T>* start)
             }
         }
     } while (!st.empty());
+}
+
+
+// Show tree as sorted vector
+template <class T>
+void BinaryTree<T>::make_vector(std::vector<T>& v, Node<T>* start)
+{
+    if (start == nullptr) start = root;
+    if (start->left) make_vector(v, start->left);
+    v.push_back(start->value);
+    if (start->right) make_vector(v, start->right);
 }
