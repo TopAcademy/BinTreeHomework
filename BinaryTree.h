@@ -7,37 +7,47 @@
 /*****************************************
 Class: Binary tree
 ******************************************/
+template <class T>
 class BinaryTree
 {
 private:
-    Node* root;
+    Node<T>* root;
 public:
-    BinaryTree(int);
-    Node* add_node(int, Node*);
-    void show_tree(Node*);
-    void show_no_rec(Node*);
-    Node* find_node(int, Node*);
+    BinaryTree(T);
+    Node<T>* add_node(T, Node<T>* = nullptr);
+    void show_tree(Node<T>* = nullptr);
+    void show_no_rec(Node<T>* = nullptr);
+    Node<T>* find_node(T, Node<T>* = nullptr);
+    Node<T>* operator<<(T);
 };
 /*****************************************/
 
+template <class T>
+Node<T>* BinaryTree<T>::operator<<(T val)
+{
+    return add_node(val);
+}
+
 
 // Constructors definitions
-
-BinaryTree::BinaryTree(int root_value)
+template <class T>
+BinaryTree<T>::BinaryTree(T root_value)
 {
-    root = new Node(root_value);
+    root = new Node<T>(root_value);
 }
 
 // Add node to the tree
-Node* BinaryTree::add_node(int val, Node* start = nullptr)
+template <class T>
+Node<T>* BinaryTree<T>::add_node(T val, Node<T>* start)
 {
     // Node * added = nullptr;
     if (start == nullptr) start = this->root;
-    Node* parent = start; // ???
-    Node* next = (val < start->value) ? start->left : start->right;
+    Node<T>* parent = start; // ???
+    Node<T>* next = (val < start->value) ? start->left : start->right;
     if (next == nullptr) {
-        next = new Node(val, start);
-        start->connect_child(next);
+        next = new Node<T>(val, start);
+        *start += next;
+        //start->connect_child(next);
     }
     else {
         next = add_node(val, next);
@@ -48,7 +58,8 @@ Node* BinaryTree::add_node(int val, Node* start = nullptr)
 
 
 // Show tree as sorted vector
-void BinaryTree::show_tree(Node* start = nullptr)
+template <class T>
+void BinaryTree<T>::show_tree(Node<T>* start)
 {
     if (start == nullptr) start = root;
     if (start->left) show_tree(start->left);
@@ -60,7 +71,8 @@ void BinaryTree::show_tree(Node* start = nullptr)
 
 
 // Find node by value
-Node* BinaryTree::find_node(int x, Node* start = nullptr)
+template <class T>
+Node<T>* BinaryTree<T>::find_node(T x, Node<T>* start)
 {
     Node* found = nullptr;
     if (start == nullptr) start = root;
@@ -78,15 +90,16 @@ Node* BinaryTree::find_node(int x, Node* start = nullptr)
 
 
 // Show tree without recursion
-void BinaryTree::show_no_rec(Node* start = nullptr)
+template <class T>
+void BinaryTree<T>::show_no_rec(Node<T>* start)
 {
     if (!start) start = root;      // По-умолчанию - с корневого узла
-    std::stack<Node*> st;          // Наш стек
-    Node* current = start;         // Текущий узел
+    std::stack<Node<T>*> st;          // Наш стек
+    Node<T>* current = start;         // Текущий узел
     bool parent_is_ok = false;
     // Старт цикла обхода дерева
     do {
-        Node* st_top = (st.empty()) ? nullptr : st.top();
+        Node<T>* st_top = (st.empty()) ? nullptr : st.top();
         // Мы попали в узел из правого потомка?
         if (parent_is_ok) {
             // возвращаемся наверх
@@ -121,5 +134,4 @@ void BinaryTree::show_no_rec(Node* start = nullptr)
             }
         }
     } while (!st.empty());
-
 }

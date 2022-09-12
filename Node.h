@@ -1,29 +1,47 @@
 #pragma once
 
-enum { LEFT_CHILD, RIGHT_CHILD };
+enum LoR { LEFT_CHILD, RIGHT_CHILD };
 
 /*****************************************
-Class: Node of binary tree
+Template class: Node of binary tree
 ******************************************/
+template <class T>
 class Node
 {
 public:
-    int value;
+    T value;
     Node * parent, * left, * right;
 public:
-    Node(int, Node*);
-    Node* get_child(int);
+    Node(const T&, Node* = nullptr);
     bool connect_child(Node*);
-    Node* disconnect_child(int);
+    Node* disconnect_child(LoR);
+    bool operator+=(Node*);
 };
 /*****************************************/
+
+
+template <class T>
+bool Node<T>::operator+=(Node* child)
+{
+    if (child->value < this->value) {
+        if (this->left) return false;
+        this->left = child;
+    }
+    else {
+        if (this->right) return false;
+        this->right = child;
+    }
+    return true;
+}
+
 
 
 /*
  Constructor
  -> value of the node and pointer to parent
 */
-Node::Node(int val, Node* parent = nullptr)
+template <class T>
+Node<T>::Node(const T& val, Node* parent)
 {
     this->value = val;
     this->parent = parent;
@@ -32,24 +50,14 @@ Node::Node(int val, Node* parent = nullptr)
 }
 
 
-/*
- Get pointer to child node (left or right)
- -> what childe (LEFT_CHILD or RIGHT_CHILD)
- <- pointer to the child
-*/
-Node* Node::get_child(int left_or_right)
-{
-    if (left_or_right == LEFT_CHILD) return this->left;
-    else return this->right;
-}
-
 
 /*
  Connect child node to this node
  -> new child node pointer
  <- true if success, false if subtree already exists
 */
-bool Node::connect_child(Node* child)
+template <class T>
+bool Node<T>::connect_child(Node* child)
 {
     if (child->value < this->value) {
         if (this->left) return false;
@@ -68,9 +76,10 @@ bool Node::connect_child(Node* child)
  -> what of 2 childs (LEFT_CHILD or RIGHT_CHILD)
  <- pointer to the disconnected child node
 */
-Node* Node::disconnect_child(int left_or_right)
+template <class T>
+Node<T>* Node<T>::disconnect_child(LoR left_or_right)
 {
-    Node* disconnected = nullptr;
+    Node* disconnected = nullptr; 
     if (left_or_right == LEFT_CHILD) {
         disconnected = this->left;
         this->left = nullptr;
