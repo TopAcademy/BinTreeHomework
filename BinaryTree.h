@@ -21,8 +21,59 @@ public:
     void show_no_rec(Node<T>* = nullptr);
     Node<T>* find_node(T, Node<T>* = nullptr);
     Node<T>* operator<<(T);
+    BinaryTree<T>& operator++();
 };
 /*****************************************/
+
+template <class T>
+BinaryTree<T>& BinaryTree<T>::operator++()
+{
+    Node<T> * start = root;      // По-умолчанию - с корневого узла
+    std::stack<Node<T>*> st;          // Наш стек
+    Node<T>* current = start;         // Текущий узел
+    bool parent_is_ok = false;
+    // Старт цикла обхода дерева
+    do {
+        Node<T>* st_top = (st.empty()) ? nullptr : st.top();
+        // Мы попали в узел из правого потомка?
+        if (parent_is_ok) {
+            // возвращаемся наверх
+            if (current->parent != nullptr) {
+                if (current == current->parent->right) parent_is_ok = true;
+                else parent_is_ok = false;
+                current = current->parent;
+            }
+            st.pop();
+            continue;
+        }
+        // Иначе работаем с узлом
+        // Текущий узел в стеке? 
+        if (st.empty() || (current != st.top())) {
+            // Если нет, мы только начали работу с узлом
+            st.push(current);
+            if (current->left) {
+                // Спускаемся влево, если там есть узел
+                current = current->left;
+            }
+        }
+        else {
+            // Мы между левым и правым
+            current->value++;
+            if (current->right) {
+                // Спускаемся вправо, если там есть куда
+                current = current->right;
+            }
+            else {
+                // Остаемся в узле, и говорим что родитель обслужен
+                parent_is_ok = true;
+            }
+        }
+    } while (!st.empty());
+    return *this;
+}
+
+
+
 
 template <class T>
 Node<T>* BinaryTree<T>::operator<<(T val)
